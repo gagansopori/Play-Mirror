@@ -9,4 +9,4 @@ Methods used:
 
 Methods in this class will display current conditions, forecast and a graph showing historical data.
 
-#### MK-II : Working on class *InstagramUpdate*
+#### MK-II : Working on class *calenderUpdate*
