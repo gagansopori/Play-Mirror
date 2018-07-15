@@ -35,7 +35,7 @@ def getLoc():
 # Weather Updates using OpenWeatherMap API
 class weatherUpdate(Frame):
 	
-	owm_key = '1ba4271ee4e9387e33e0d4275c045c81'
+	owm_key = 'get yours at openweathermaps.org/api'
 
 	def __init__(self, parent, *args, **kwargs):
 
@@ -158,28 +158,6 @@ class newsUpdate:
 			desc = headline.entries[len(items)-length].description				#check to print the text part
 			#print(desc)
 			length = length-1
-
-
-#Instagram Updates using the Instagram API
-# class InstagramUpdate:
-
-# 	client_id = '993a3c6b93bc4180b77bf3fc22dcddd7'
-# 	redirect_url = 'https://www.projectsbysopori.in/'
-# 	access_token = '1136723953.993a3c6.20cfad497d6a4e75bf356d047d761b27'
-
-# 	def getAuth(authorize):
-
-# 		auth_url = 'https://api.instagram.com/oauth/authorize/?client_id=%s&redirect_uri=%s&response_type=token' %(authorize.client_id, authorize.redirect_url)
-
-
-
-# 	def getRecentMedia(media, lat, lon):
-
-# 		#media_url = 'https://api.instagram.com/v1/media/search?lat=%s&lng=%s&access_token=%s&scope=' %(lat, lon, media.access_token)
-# 		followers = 'https://www.instagram.com/gagansopori/following/'
-# 		photo_dat = feedparser.parse(followers)
-# 		print(photo_dat)
-
 
 
 
