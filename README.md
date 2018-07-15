@@ -8,7 +8,7 @@ Python application that displays weather, headlines, emails, calendar and instag
 
     1. ***getWeather***: Method Calling the weather API to get the current conditions for the given location passing (lat, lon) as arguments every 60 minutes.
     2. ***getForecast***: Method calling the weather API to get the 3-hour forecasts for the next 5-days passing (lat, lon) as arguments, every 180 minutes.
-    3. ***__\init\__***: This method displays current conditions, forecast and a graph showing historical data **(MK-II)** graphically.
+    3. ***init***: This method displays current conditions, forecast and a graph showing historical data **(MK-II)** graphically.
 
 3. ***newsUpdate***: Class containing methods to get the latest news headlines and a short descirption of the news. The Class uses the  [feedparser](https://pypi.org/project/feedparser/) to parse through the RSS feed *(I have used the [Reuters World News](http://feeds.reuters.com/Reuters/worldNews) feed)* and extract the plain text data which are used as headlines.
 
