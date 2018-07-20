@@ -5,7 +5,7 @@ Python application that displays weather, headlines, emails, calendar and instag
 1. ***getLoc***: Method to get the current location of the user. the methods makes an http request to recieve the coordinates(lat, lon) in json file format. This method shall be used by various classes in the present and the future modules.
 
 
-2. ***timeUpdate***: Class containing methods to get the current time, date and day of week *(Currently im using the system time using the time class in python, but i will soon replace it with the [ntp time](https://developers.google.com/time/)*.
+2. ***timeUpdate***: Class containing methods to get the current time, date and day of week *(Currently im using the system time using the time class in python, but i will soon replace it with the [ntp time](https://developers.google.com/time/))*.
 
    1. ***getTime***: Method calling the inbuilt time class to get the system time. This method also displays the current city and state
 
