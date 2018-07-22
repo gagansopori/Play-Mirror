@@ -53,21 +53,32 @@ class timeClock(Frame):
 		self.locLabel.pack(side = TOP, anchor = NE, padx = 10, pady = 10)
 
 		#date
-		self.dateLabel = Label(self.frame, font = ('Segoe UI', 22), fg = 'white', bg = 'black')
+		self.dateLabel = Label(self.frame, font = ('Segoe UI', 18), fg = 'white', bg = 'black')
 		self.dateLabel.pack(side = TOP, anchor = NE)
 
 
 	def getTime(tick, city, state):
 
-		timer = time.strftime('%I:%M %p')
-		tick.timeLabel.config(text = timer)
+		hh = time.strftime('%I')
+		mm = time.strftime('%M')
+		ss = time.strftime('%S')
+		mer = time.strftime('%p')
+		dt = time.strftime('%d')
+		mon = time.strftime('%b')
+		yr = time.strftime('%Y')
+		day = time.strftime('%a')
+
+		tick.timeLabel.config(text = "%s:%s %s" %(hh,mm,mer))
 		tick.locLabel.config(text = "%s, %s" %(city, state))
+		tick.dateLabel.config(text = "%s, %s %s %s" %(day,mon,dt,yr))
+
+		return ss
 
 
 # Weather Updates using OpenWeatherMap API
 class weatherUpdate(Frame):
 	
-	owm_key = 'get your own at owm api'
+	owm_key = 'Get yours @ OpenWeatherMaps or a similar service (you may have to modify the code accordingly)'
 
 	def __init__(self, parent, *args, **kwargs):
 
@@ -112,9 +123,9 @@ class weatherUpdate(Frame):
 		desc = response_dat['weather'][0]['main']						#currentCondition
 		weather.conditionLabel.config(text = desc)
 		
-		####### Error Region Still Working on it##########################################################################		
+		####### Error Region ############################################################################################		
 		weather.iconID = response_dat['weather'][0]['icon']						#iconCode (currentCondition)
-		weather.icon = PhotoImage("/assets/icon/%s.png"%weather.iconID)
+		weather.icon = PhotoImage("/assets/icons/%s.png"%weather.iconID)
 		weather.iconLabel.config(image=weather.icon)
 		weather.iconLabel.image = weather.icon
 		##################################################################################################################
@@ -171,7 +182,7 @@ class newsUpdate(Frame):
 #Forecast Display and Analysis
 class forecastUpdate(Frame):
 
-	owm_key = 'get your pwn at owmapi'
+	owm_key = 'Get yours @ OpenWeatherMaps or a similar service (you may have to modify the code accordingly)'
 
 	def __init__(self, parent, *args, **kwargs):
 
@@ -179,6 +190,18 @@ class forecastUpdate(Frame):
 
 		self.frame = Frame(self, bg = 'black')				#create the frame
 		self.frame.pack(side = TOP, anchor = W)				#pack the frame
+
+		#temperature
+		# self.forecastLabel = Label(self.frame, font = ('Segoe UI', 16), fg = 'white', bg = 'black')
+		# self.forecastLabel.pack(side = TOP, anchor = NW)
+
+		#icon
+		# self.iconLabel = Label(self.frame, bg = 'black', height = 7, width = 7)			
+		# self.iconLabel.pack(side = LEFT, anchor = NW, padx = 20)
+
+		#conditionDescription
+		# self.conditionLabel = Label(self.frame, font = ('Segoe UI', 18), fg = 'white', bg = 'black')
+		# self.conditionLabel.pack(side = TOP, anchor = NW, padx = 10)
 
 
 
@@ -189,16 +212,35 @@ class forecastUpdate(Frame):
 		query2 = fore_resp.read().decode('utf-8')
 		resp_2 = json.loads(query2)
 		fore_resp.close()
-		#print(resp_2)
+		# print(resp_2)
+		response = len(resp_2)
 		df = json_normalize(resp_2['list'])
-		df2 = pandas.DataFrame(df)
-		df2.to_csv('forecast.csv')
+		print (df)
+		#df2 = pandas.DataFrame(df)
+		df.to_csv('/assets/forecast.csv')
 
 
 		if(country == 'US' or country == 'LR' or country == 'MM'):
 			
-			fore_temp = ((resp_2['list'][1]['main']['temp'])*(9/5))-459.67			#Change the function to get values for all the times
-			print("%.1f"%fore_temp)
+			for i in resp_2['list'][0:35]: 
+				fore_temp = ((resp_2['list'][len(i)-response-1]['main']['temp']))#*(9/5))-459.67			#Change the function to get values for all the times
+				# print(resp_2['list'][len(i)-response-1]['dt'])
+				
+				foreR = resp_2['list'][len(i)-response-1]['dt_txt']		#getting the datestring from json
+				#Splitting the string into Date & Time
+				foreD, foreT = foreR.split(' ')
+				foreTime = foreT[0:5]
+				foreD2 = foreD
+
+				if(foreD2 != foreD):
+
+					# print(fore_temp)
+					print(foreTime)
+					print(foreD)
+				# forecast.forecastLabel2 = Label(forecast.frame, font = ('Segoe UI', 16), fg = 'white', bg = 'black', text = "%s"%foreTime)
+				# forecast.forecastLabel2.pack(side = TOP, anchor = NW)
+
+				response = response-1
 
 		else:
 
@@ -210,8 +252,8 @@ class forecastUpdate(Frame):
 root=Tk()
 topFrame = Frame(root, bg = 'black')
 bottomFrame = Frame(root, bg = 'black')
-leftFrame = Frame(root, bg = 'black')
-rightFrame = Frame(root, bg = 'black')
+leftFrame = Frame(root, bg = 'green')
+rightFrame = Frame(root, bg = 'blue')
 
 topFrame.pack(side = TOP, fill = BOTH, expand = YES)
 bottomFrame.pack(side = BOTTOM, fill = BOTH, expand = YES)
@@ -234,13 +276,12 @@ F_Up = forecastUpdate(leftFrame)
 country = W_Up.getWeather(lat, lon)
 F_Up.getForecast(lat, lon, country)
 N_Up.getNews()
-T_Up.getTime(city, state)
+sec = T_Up.getTime(city, state)
 
 #PACKING FRAMES
 W_Up.pack(side = LEFT, anchor = N, padx = 50, pady = 50)		#Weather
 N_Up.pack(side = RIGHT, anchor = S, padx = 50, pady = 50)		#News
 T_Up.pack(side = RIGHT, anchor = N, padx = 50, pady = 50)		#Date & Time
-F_Up.pack(side = LEFT, anchor = N, padx = 50, pady = 50)		#Forecast
+F_Up.pack(side = TOP, anchor = NW, padx = 50, pady = 50)		#Forecast
 
 root.mainloop()
-
