@@ -1,7 +1,8 @@
-#PlayMirror-MKI
-#features: Weather, Clock, News, Calendar, Email
-#requirements: Pillow (pip install pillow), Tkinter (pip install tkinter), feedparser (pip install feedparser), pandas (pip install pandas)
-#@author: Gagan Sopori
+# PlayMirror-MKI
+# features: Weather, Clock, News, Calendar, Email
+# requirements: Pillow (pip install pillow), Tkinter (pip install tkinter), feedparser (pip install feedparser), pandas (pip install pandas), requests (pip install requests)
+# dependencies: ntplib (pip install ntplib), googleapiclient(pip install google-api-python-client)
+# @author: Gagan Sopori
 
 from tkinter import *
 from PIL import Image, ImageTk
@@ -12,9 +13,10 @@ import time
 import feedparser
 import pandas
 import csv
+import traceback
 
 
-#function to get location using IP address
+# function to get location using IP address
 def getLoc():
 	try:
 		with urllib.request.urlopen("http://ip-api.com/json") as url:
@@ -26,6 +28,7 @@ def getLoc():
 		lon = ip_dat['lon']
 		city = ip_dat['city']
 		state = ip_dat['region']
+		stateName = ip_dat['regionName']
 
 		return lat, lon, state, city
 
@@ -48,13 +51,13 @@ class timeClock(Frame):
 		self.timeLabel = Label(self.frame, font = ('Segoe UI', 60), fg = 'white', bg = 'black')
 		self.timeLabel.pack(side = TOP, anchor = NE)
 
-		#location
-		self.locLabel = Label(self.frame, font = ('Segoe UI', 22), fg = 'white', bg = 'black')
-		self.locLabel.pack(side = TOP, anchor = NE, padx = 10, pady = 10)
-
 		#date
 		self.dateLabel = Label(self.frame, font = ('Segoe UI', 18), fg = 'white', bg = 'black')
 		self.dateLabel.pack(side = TOP, anchor = NE)
+
+		#location
+		self.locLabel = Label(self.frame, font = ('Segoe UI', 18), fg = 'white', bg = 'black')
+		self.locLabel.pack(side = TOP, anchor = NE, padx = 10, pady = 10)
 
 
 	def getTime(tick, city, state):
@@ -69,9 +72,10 @@ class timeClock(Frame):
 		day = time.strftime('%a')
 
 		tick.timeLabel.config(text = "%s:%s %s" %(hh,mm,mer))
-		tick.locLabel.config(text = "%s, %s" %(city, state))
 		tick.dateLabel.config(text = "%s, %s %s %s" %(day,mon,dt,yr))
+		tick.locLabel.config(text = "%s, %s" %(city, state))
 
+		tick.timeLabel.after(900, tick.getTime, city, state)
 		return ss
 
 
@@ -93,8 +97,8 @@ class weatherUpdate(Frame):
 		self.tempLabel.pack(side = TOP, anchor = NW)
 
 		#icon
-		self.iconLabel = Label(self.frame, bg = 'green', height = 75, width = 75)			
-		self.iconLabel.pack(side = LEFT, anchor = NW, padx = 20)
+		self.iconLabel = Label(self.frame, bg = 'black', height = 75, width = 75)			
+		self.iconLabel.pack(side = LEFT, anchor = N, padx = 10)		
 
 		#conditionDescription
 		self.conditionLabel = Label(self.frame, font = ('Segoe UI', 18), fg = 'white', bg = 'black')
@@ -102,7 +106,7 @@ class weatherUpdate(Frame):
 
 		#max\minTemperature
 		self.maxminLabel = Label(self.frame, font = ('Segoe UI', 16), fg = 'white', bg = 'black')
-		self.maxminLabel.pack(side = LEFT, anchor = NW, padx = 10, pady = 10)
+		self.maxminLabel.pack(side = LEFT, anchor = NW, padx = 5, pady = 10)
 
 		#forecastTemperature
 		self.forecastLabel = Label(self.frame, font = ('Segoe UI', 14), fg = 'white', bg = 'black')
@@ -122,18 +126,19 @@ class weatherUpdate(Frame):
 
 		desc = response_dat['weather'][0]['main']						#currentCondition
 		weather.conditionLabel.config(text = desc)
-		
-		####### Error Region ############################################################################################		
-		weather.iconID = response_dat['weather'][0]['icon']						#iconCode (currentCondition)
-		weather.icon = PhotoImage("/assets/icons/%s.png"%weather.iconID)
-		weather.iconLabel.config(image=weather.icon)
+				
+		weather.iconID = response_dat['weather'][0]['icon']				#iconCode (currentCondition)
+
+		#displaying the icon in a container
+		weather.icon = PhotoImage(file = "D:/Python3/PlayMirror/assets/icons/%s.png"%weather.iconID)
+		weather.iconLabel.config(image = weather.icon)
 		weather.iconLabel.image = weather.icon
-		##################################################################################################################
 		
 		if(weather.country == 'US' or weather.country == 'LR' or weather.country == 'MM'):
 			deg = u'\u00b0'
+			# SI = "F"
 			temperature = ((response_dat['main']['temp'])*(9/5))-459.67			#temperature Farenheit
-			weather.tempLabel.config(text = "%.1f%s"%(temperature,deg))
+			weather.tempLabel.config(text = "%.1f%s"%(temperature,deg))#,SI))
 
 			high = ((response_dat['main']['temp_max'])*(9/5))-459.67
 			low = ((response_dat['main']['temp_min'])*(9/5))-459.67
@@ -148,10 +153,12 @@ class weatherUpdate(Frame):
 			low = response_dat['main']['temp_min']-273
 			weather.maxminLabel.config(text = "H: %.1f | L: %.1f" %(high, low))
 
+		#RECURSIVE CALL
+		weather.tempLabel.after(1200000, weather.getWeather, lat, lon)
 		return weather.country
 
 
-#News Update using feedparser library & News Service
+# News Update using feedparser library & News Service
 class newsUpdate(Frame):
 
 	news_url = 'http://feeds.reuters.com/Reuters/worldNews'
@@ -162,11 +169,20 @@ class newsUpdate(Frame):
 		self.frame = Frame(self, bg = 'black')				#create the frame
 		self.frame.pack(side = TOP, anchor = W)				#pack the frame
 
+		# self.newsLabel = Label(self.frame, font = ('Segoe UI Semilight', 14), fg = 'white', bg = 'black')
+		# self.newsLabel.pack(side = TOP, anchor = E, padx = 20, pady = 2)
+
 
 	def getNews(news):
 
+		
+		for child in news.frame.winfo_children():
+			child.destroy()
+
+
 		headline = feedparser.parse(news.news_url)
 		length = len(headline)
+
 
 		for items in headline.entries[0:5]:
 			title = headline.entries[len(items)-length].title
@@ -178,8 +194,10 @@ class newsUpdate(Frame):
 			desc = headline.entries[len(items)-length].description				#check to print the text part
 			length = length-1
 
+			news.newsLabel.after(2400000, news.getNews)
 
-#Forecast Display and Analysis
+
+# Forecast Display and Analysis
 class forecastUpdate(Frame):
 
 	owm_key = 'Get yours @ OpenWeatherMaps or a similar service (you may have to modify the code accordingly)'
@@ -212,13 +230,9 @@ class forecastUpdate(Frame):
 		query2 = fore_resp.read().decode('utf-8')
 		resp_2 = json.loads(query2)
 		fore_resp.close()
-		# print(resp_2)
-		response = len(resp_2)
-		df = json_normalize(resp_2['list'])
-		print (df)
-		#df2 = pandas.DataFrame(df)
-		df.to_csv('/assets/forecast.csv')
 
+
+		response = len(resp_2)
 
 		if(country == 'US' or country == 'LR' or country == 'MM'):
 			
@@ -249,7 +263,15 @@ class forecastUpdate(Frame):
 
 
 
+		# df = json_normalize(resp_2['list'])
+		# df2 = pandas.DataFrame(df)
+		# df.to_csv('/assets/forecast.csv')
+
+
+
 root=Tk()
+root.title('PlayMirror')
+# root.iconbitmap('favicon.ico')
 topFrame = Frame(root, bg = 'black')
 bottomFrame = Frame(root, bg = 'black')
 leftFrame = Frame(root, bg = 'green')
@@ -261,24 +283,25 @@ leftFrame.pack(side = LEFT, fill = BOTH, expand = YES)
 rightFrame.pack(side = RIGHT, fill = BOTH, expand = YES)
 
 
-lat, lon, state, city = getLoc()
-
-#WEATHER
+# WEATHER
 W_Up = weatherUpdate(topFrame)
-#NEWS
+# NEWS
 N_Up = newsUpdate(bottomFrame)
-#TIME
+# TIME
 T_Up = timeClock(topFrame)
-#FORECAST
+# FORECAST
 F_Up = forecastUpdate(leftFrame)
 
-#METHOD CALLS
+
+# METHOD_CALLS
+lat, lon, state, city = getLoc()
+T_Up.getTime(city, state)
 country = W_Up.getWeather(lat, lon)
 F_Up.getForecast(lat, lon, country)
 N_Up.getNews()
-sec = T_Up.getTime(city, state)
 
-#PACKING FRAMES
+
+# PACKING_FRAMES
 W_Up.pack(side = LEFT, anchor = N, padx = 50, pady = 50)		#Weather
 N_Up.pack(side = RIGHT, anchor = S, padx = 50, pady = 50)		#News
 T_Up.pack(side = RIGHT, anchor = N, padx = 50, pady = 50)		#Date & Time
