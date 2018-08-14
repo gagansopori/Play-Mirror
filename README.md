@@ -16,6 +16,7 @@ Python application that displays weather, headlines, emails, calendar and instag
 4. ***newsUpdate***: Class containing methods to get the latest news headlines and a short descirption of the news. The Class uses the  [feedparser](https://pypi.org/project/feedparser/) to parse through the RSS feed *(I have used the [Reuters World News](http://feeds.reuters.com/Reuters/worldNews) feed)* and extract the plain text data which are used as headlines.
 
    1. ***getNews***: Method calling the RSS feed to get the latest headlines from the world news. It uses the [feedparser](https://pypi.org/project/feedparser/) library to parse through the webpage and extract text from the \<title>& \<summary> tags (in this case) to be used as the News Headlines.
+   
    **Initialization of the frame labels is buggy (workin on it).** Initialization of labels follow a recursive pattern (5,5,3,3,4,5)
 
 5. ***forecastUpdate***: Class containing method to get the forecast from the API to display and then store in a database for future prediction.
