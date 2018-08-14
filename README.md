@@ -11,7 +11,7 @@ Python application that displays weather, headlines, emails, calendar and instag
 
 3. ***weatherUpdate***, Class containing methods to get current conditions, forecast & historical data for analysis from the [OpenWeatherMap API](https://openweathermap.org/api). This data shall be analysed **(MK-II)** using the [NumPy](http://www.numpy.org/) library functions and plotted using [matplotlib](https://matplotlib.org/) functions to show historical trends.
 
-    1. ***getWeather***: Method Calling the weather API to get the current conditions for the given location passing (lat, lon) as arguments every 60 minutes
+    1. ***getWeather***: Method Calling the weather API to get the current conditions for the given location passing (lat, lon) as arguments every 20 minutes
 
 4. ***newsUpdate***: Class containing methods to get the latest news headlines and a short descirption of the news. The Class uses the  [feedparser](https://pypi.org/project/feedparser/) to parse through the RSS feed *(I have used the [Reuters World News](http://feeds.reuters.com/Reuters/worldNews) feed)* and extract the plain text data which are used as headlines.
 
